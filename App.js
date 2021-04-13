@@ -1,30 +1,18 @@
-import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import LoginScreen from './android/screens/LoginScreen';
-import SIgnUpScreen from './android/screens/SIgnUpScreen';
-import ChatApp from './android/screens/ChatApp'
+import React, { Fragment } from "react";
+import NavContainer from "./android/app/src/navigation";
+import Loader from "./android/app/src/components/loader";
+import { StoreProvider } from "./android/app/src/context/store";
+import { StatusBar } from "react-native";
 
-const Stack = createStackNavigator();
 
-const app = () => {
+const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="LoginScreen"
-          component={LoginScreen}
-        />
-           <Stack.Screen
-          name="SignUpScreen"
-          component={SIgnUpScreen}
-        />
-         <Stack.Screen
-          name="ChatApp"
-          component={ChatApp}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  )
-  }
-  export default app;
+    <StoreProvider>
+      <StatusBar barStyle="light-content" />
+      <NavContainer />
+      <Loader />
+    </StoreProvider>
+  );
+};
+
+export default App;

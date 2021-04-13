@@ -1,6 +1,5 @@
 import firebase from '../../firebase/config';
-
-export const senderMsg = async (msgValue, currentUserId, guestUserId, img) => {
+const senderMsg = async (msgValue, currentUserId, guestUserId, img) => {
   try {
     return await firebase
       .database()
@@ -19,7 +18,7 @@ export const senderMsg = async (msgValue, currentUserId, guestUserId, img) => {
   }
 };
 
-export const recieverMsg = async (
+const recieverMsg = async (
   msgValue,
   currentUserId,
   guestUserId,
@@ -42,3 +41,4 @@ export const recieverMsg = async (
     return error;
   }
 };
+export default {senderMsg,recieverMsg};

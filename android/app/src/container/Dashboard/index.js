@@ -9,10 +9,10 @@ import { Store } from "../../context/store";
 import { LOADING_STOP, LOADING_START } from "../../context/actions/type";
 import { uuid, smallDeviceHeight } from "../../utility/constants";
 import { clearAsyncStorage } from "../../asyncStorage";
-import { deviceHeight } from "../../utility/stylehelper/appStyle";
+import { deviceHeight, deviceWidth } from "../../utility/stylehelper/appStyle";
 import { UpdateUser, LogOutUser } from "../../network";
 
-export default ({ navigation }) => {
+const Dashboard =  ({ navigation }) => {
   const globalState = useContext(Store);
   const { dispatchLoaderAction } = globalState;
 
@@ -21,6 +21,7 @@ export default ({ navigation }) => {
     name: "",
     profileImg: "",
   });
+
   const [getScrollPosition, setScrollPosition] = useState(0);
   const [allUsers, setAllUsers] = useState([]);
   const { profileImg, name } = userDetail;
@@ -62,7 +63,6 @@ export default ({ navigation }) => {
         .database()
         .ref("users")
         .on("value", (dataSnapshot) => {
-          let users = [];
           let currentUser = {
             id: "",
             name: "",
@@ -112,7 +112,6 @@ export default ({ navigation }) => {
       } else if (response.customButton) {
         console.log("User tapped custom button: ", response.customButton);
       } else {
-        // Base 64 image:
         let source = "data:image/jpeg;base64," + response.data;
         dispatchLoaderAction({
           type: LOADING_START,
@@ -136,7 +135,6 @@ export default ({ navigation }) => {
       }
     });
   };
-  // * LOG OUT
   const logout = () => {
     LogOutUser()
       .then(() => {
@@ -235,3 +233,5 @@ export default ({ navigation }) => {
     </SafeAreaView>
   );
 };
+
+export default Dashboard;

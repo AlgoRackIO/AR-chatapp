@@ -20,7 +20,9 @@ import {
 } from "../../utility/constants";
 import { SignUpRequest, AddUser } from "../../network";
 
-export default ({ navigation }) => {
+
+
+const SignUp = ({ navigation }) => {
   const globalState = useContext(Store);
   const { dispatchLoaderAction } = globalState;
   const [credential, setCredential] = useState({
@@ -35,8 +37,6 @@ export default ({ navigation }) => {
   const setInitialState = () => {
     setCredential({ email: "", password: "", confirmPassword: "" });
   };
-
-  //   * ON SIGN UP PRESS
   const onSignUpPress = () => {
     Keyboard.dismiss();
     if (!name) {
@@ -50,7 +50,7 @@ export default ({ navigation }) => {
     } else {
       dispatchLoaderAction({
         type: LOADING_START,
-      });
+      });      
       SignUpRequest(email, password)
         .then((res) => {
           if (!res.additionalUserInfo) {
@@ -97,14 +97,13 @@ export default ({ navigation }) => {
       toggleLogo(false);
     }, 200);
   };
-  // * ON INPUT BLUR
-
-  const handleBlur = () => {
+ const handleBlur = () => {
     setTimeout(() => {
       toggleLogo(true);
     }, 200);
   };
   return (
+
     <KeyboardAvoidingView
       keyboardVerticalOffset={keyboardVerticalOffset}
       behavior={Platform.OS == "ios" ? "padding" : "height"}
@@ -175,3 +174,5 @@ export default ({ navigation }) => {
     </KeyboardAvoidingView>
   );
 };
+
+export default SignUp;

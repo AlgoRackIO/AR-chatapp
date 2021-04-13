@@ -7,9 +7,8 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
 } from "react-native";
-("react-native-keyboard-aware-scroll-view");
 import { Logo,InputField } from "../../components";
-import {RoundCornerButton} from '../../components/button/RoundCornerButton'
+import {RoundCornerButton} from '../../components'
 import { color } from "../../utility";
 import { Store } from "../../context/store";
 import { LOADING_START, LOADING_STOP } from "../../context/actions/type";
@@ -20,7 +19,7 @@ import {
 } from "../../utility/constants";
 import { LoginRequest } from "../../network";
 
-export default ({ navigation }) => {
+const Login = ({ navigation }) => {
   const globalState = useContext(Store);
   const { dispatchLoaderAction } = globalState;
   const [credential, setCredential] = useState({
@@ -33,7 +32,6 @@ export default ({ navigation }) => {
   const setInitialState = () => {
     setCredential({ email: "", password: "" });
   };
-  // * HANDLE ON CHANGE
   const handleOnChange = (name, value) => {
     setCredential({
       ...credential,
@@ -121,8 +119,7 @@ export default ({ navigation }) => {
               onFocus={() => handleFocus()}
               onBlur={() => handleBlur()}
             />
-
-            <RoundCornerButton title="Login" onPress={() => onLoginPress()} />
+            <RoundCornerButton title="Login" onPress={() => onLoginPress()}/>
             <Text
               style={{
                 fontSize: 28,
@@ -142,3 +139,4 @@ export default ({ navigation }) => {
     </KeyboardAvoidingView>
   );
 };
+export default Login;

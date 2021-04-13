@@ -8,7 +8,7 @@ import {
   Splash,
   ShowFullImg,
   Chat,
-} from "../container";
+} from "../container/";
 import { color } from "../utility";
 
 const Stack = createStackNavigator();
@@ -29,11 +29,11 @@ function NavContainer() {
           headerTitleAlign: "center",
         }}
       >
-        {/* <Stack.Screen
+        <Stack.Screen
           name="Splash"
           component={Splash}
           options={{ headerShown: false }}
-        /> */}
+        />
         <Stack.Screen
           name="Login"
           component={Login}
@@ -51,7 +51,7 @@ function NavContainer() {
             headerLeft: null,
           }}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
           name="ShowFullImg"
           component={ShowFullImg}
           options={{
@@ -64,7 +64,7 @@ function NavContainer() {
           options={{
             headerBackTitle: null,
           }}
-        /> */}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

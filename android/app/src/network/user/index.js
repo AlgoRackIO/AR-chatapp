@@ -28,3 +28,4 @@ export const UpdateUser = async (uuid, imgSource) => {
     return error;
   }
 };
+export default {AddUser,UpdateUser};
