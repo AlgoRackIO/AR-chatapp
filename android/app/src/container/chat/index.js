@@ -12,12 +12,11 @@ import {
 import ImagePicker from "react-native-image-picker";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import {color} from "../../utility";
-import {globalStyle,appStyle} from "../../utility/stylehelper"
 import styles from "./styles";
 import { InputField, ChatBox } from "../../components";
 import firebase from "../../firebase/config";
 import { senderMsg, recieverMsg } from "../../network";
-import { deviceHeight } from "../../utility/stylehelper/appStyle";
+import { deviceHeight,fieldHeight } from "../../utility/stylehelper/appStyle";
 import { smallDeviceHeight } from "../../utility/constants";
 
 const Chat = ({ route, navigation }) => {
@@ -61,9 +60,6 @@ const Chat = ({ route, navigation }) => {
       senderMsg(msgValue, currentUserId, guestUserId, "")
         .then(() => {})
         .catch((err) => alert(err));
-
-      // * guest user
-
       recieverMsg(msgValue, currentUserId, guestUserId, "")
         .then(() => {})
         .catch((err) => alert(err));
@@ -83,14 +79,12 @@ const Chat = ({ route, navigation }) => {
       } else if (response.error) {
         console.log(" image picker error", response.error);
       } else {
-        // Base 64
+
         let source = "data:image/jpeg;base64," + response.data;
 
         senderMsg(msgValue, currentUserId, guestUserId, source)
           .then(() => {})
-          .catch((err) => alert(err));
-
-        // * guest user
+          .catch((err) => alert(err));W
 
         recieverMsg(msgValue, currentUserId, guestUserId, source)
           .then(() => {})
@@ -112,7 +106,7 @@ const Chat = ({ route, navigation }) => {
       <KeyboardAvoidingView
         keyboardVerticalOffset={deviceHeight > smallDeviceHeight ? 100 : 70}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={[lex1, { backgroundColor: color.BLACK }]}
+        style={{ backgroundColor: color.BLACK, flex:1 }}
       >
         <TouchableWithoutFeedback
           style={{flex:1}}
@@ -146,13 +140,13 @@ const Chat = ({ route, navigation }) => {
                 <MaterialCommunityIcons
                   name="camera"
                   color={color.WHITE}
-                  size={appStyle.fieldHeight}
+                  size={fieldHeight}
                   onPress={() => handleCamera()}
                 />
                 <MaterialCommunityIcons
                   name="send-circle"
                   color={color.WHITE}
-                  size={appStyle.fieldHeight}
+                  size={fieldHeight}
                   onPress={() => handleSend()}
                 />
               </View>

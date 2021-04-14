@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState, useLayoutEffect } from "react";
 import { SafeAreaView, Alert, Text, View, FlatList } from "react-native";
-import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import ImagePicker from "react-native-image-picker";
 import { Profile, ShowUsers, StickyHeader } from "../../components";
 import firebase from "../../firebase/config";
@@ -28,7 +28,7 @@ const Dashboard =  ({ navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <SimpleLineIcons
+        <AntDesign
           name="logout"
           size={26}
           color={color.WHITE}
@@ -63,6 +63,7 @@ const Dashboard =  ({ navigation }) => {
         .database()
         .ref("users")
         .on("value", (dataSnapshot) => {
+          let users=[];
           let currentUser = {
             id: "",
             name: "",

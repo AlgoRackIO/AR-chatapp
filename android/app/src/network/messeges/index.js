@@ -41,4 +41,4 @@ const recieverMsg = async (
     return error;
   }
 };
-export default {senderMsg,recieverMsg};
+export {senderMsg,recieverMsg};
