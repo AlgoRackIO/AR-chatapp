@@ -1,9 +1,7 @@
 import { StyleSheet } from "react-native";
 import { color } from "../../utility";
-import { smallDeviceHeight } from "../../utility/constants";
-import {deviceHeight,fieldTextColor} from '../../utility/stylehelper/appStyle'
-
-
+import {deviceHeight} from "../../utility/stylehelper/appStyle"
+import { smallDeviceHeight} from "../../utility/constants";
 
 const getDimensions = (key) => {
   if (deviceHeight > smallDeviceHeight) {
@@ -77,12 +75,12 @@ export default StyleSheet.create({
   img: getDimensions("img"),
   editImgContainer: getDimensions("editImgContainer"),
   name: {
-    color: fieldTextColor,
+    color:color.WHITE,
     fontSize: 50,
     fontWeight: "bold",
   },
   welcome: {
-    color: fieldTextColor,
+    color: color.WHITE,
     fontSize: 24,
     fontWeight: "bold",
     padding: 10,

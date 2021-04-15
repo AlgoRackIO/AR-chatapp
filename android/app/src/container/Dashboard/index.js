@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState, useLayoutEffect } from "react";
 import { SafeAreaView, Alert, Text, View, FlatList } from "react-native";
-import AntDesign from "react-native-vector-icons/AntDesign";
+import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import ImagePicker from "react-native-image-picker";
 import { Profile, ShowUsers, StickyHeader } from "../../components";
 import firebase from "../../firebase/config";
@@ -11,6 +11,8 @@ import { uuid, smallDeviceHeight } from "../../utility/constants";
 import { clearAsyncStorage } from "../../asyncStorage";
 import { deviceHeight, deviceWidth } from "../../utility/stylehelper/appStyle";
 import { UpdateUser, LogOutUser } from "../../network";
+
+
 
 const Dashboard =  ({ navigation }) => {
   const globalState = useContext(Store);
@@ -28,7 +30,7 @@ const Dashboard =  ({ navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <AntDesign
+        <SimpleLineIcons
           name="logout"
           size={26}
           color={color.WHITE}

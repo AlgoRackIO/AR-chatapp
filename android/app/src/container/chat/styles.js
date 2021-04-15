@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { color, appStyle } from "../../utility";
+import {fieldHeight} from "../../utility/stylehelper/appStyle"
 
 export default StyleSheet.create({
   sendMessageContainer: {
@@ -14,8 +15,7 @@ export default StyleSheet.create({
   },
 
   sendBtnContainer: {
-    height: appStyle.fieldHeight,
-    backgroundColor: color.DARK_GRAY,
+    height:fieldHeight,
     borderTopRightRadius: 20,
     borderBottomRightRadius: 20,
     alignItems: "center",
