@@ -35,7 +35,6 @@ const Chat = ({ route, navigation }) => {
       firebase
         .database()
         .ref("messeges")
-        .child(currentUserId)
         .child(guestUserId)
         .on("value", (dataSnapshot) => {
           let msgs = [];

@@ -5,7 +5,6 @@ const senderMsg = async (msgValue, currentUserId, guestUserId, img) => {
     return await firebase
       .database()
       .ref('messeges/' + currentUserId)
-      .child(guestUserId)
       .push({
           reciever: guestUserId,
           msg: msgValue,
@@ -26,7 +25,6 @@ const recieverMsg = async (
     return await firebase
       .database()
       .ref('messeges/' + guestUserId)
-      .child(currentUserId)
       .push({
           sender: currentUserId,
           msg: msgValue,
