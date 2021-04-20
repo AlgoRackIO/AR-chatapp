@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState, useLayoutEffect } from "react";
-import { SafeAreaView, Alert, Text, View, FlatList } from "react-native";
+import { SafeAreaView, Alert, Text, View, FlatList,StyleSheet } from "react-native";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import ImagePicker from "react-native-image-picker";
-import { Profile, ShowUsers, StickyHeader } from "../../components";
+import { Profile, StickyHeader } from "../../components";
 import firebase from "../../firebase/config";
 import { color } from "../../utility";
 import { Store } from "../../context/store";
@@ -11,13 +11,17 @@ import { uuid, smallDeviceHeight } from "../../utility/constants";
 import { clearAsyncStorage } from "../../asyncStorage";
 import { deviceHeight, deviceWidth } from "../../utility/stylehelper/appStyle";
 import { UpdateUser, LogOutUser } from "../../network";
-
-
+import {RoundCornerButton} from '../../components';
+import { MultiPickerMaterialDialog } from 'react-native-material-dialog';
+import Dialog from "react-native-dialog";
+import {ShowUsers,Showgroups} from "../../components/showUserAndGroups";
+import profile from "../../components/profile";
 
 const Dashboard =  ({ navigation }) => {
   const globalState = useContext(Store);
-  const { dispatchLoaderAction } = globalState;
-
+  const { dispatchLoaderAction } = globalState; 
+  const [visible, setVisible] = useState(false);
+  const [groupName, setGroupName] = useState('');
   const [userDetail, setUserDetail] = useState({
     id: "",
     name: "",
@@ -26,6 +30,7 @@ const Dashboard =  ({ navigation }) => {
 
   const [getScrollPosition, setScrollPosition] = useState(0);
   const [allUsers, setAllUsers] = useState([]);
+  const [allGroups, setAllgroups] = useState([]);
   const { profileImg, name } = userDetail;
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -90,6 +95,22 @@ const Dashboard =  ({ navigation }) => {
             type: LOADING_STOP,
           });
         });
+        firebase
+        .database()
+        .ref("groups")
+        .on("value",(dataSnapshot)=>{
+          let groups=[];
+          dataSnapshot.forEach((data)=>{
+           groups.push({
+             groupname: data.child("name").val(),
+           })
+          });
+          setAllgroups(groups);
+          dispatchLoaderAction({
+            type: LOADING_STOP,
+          });
+        });
+      
     } catch (error) {
       alert(error);
       dispatchLoaderAction({
@@ -138,6 +159,29 @@ const Dashboard =  ({ navigation }) => {
       }
     });
   };
+  const showDialog = () => {
+    setVisible(true);
+  };
+
+  const handleCancel = () => {
+    setVisible(false);
+  };
+
+  const handleAdd = async() => {
+    try{
+      await firebase
+      .database()
+      .ref('groups/')
+      .push({
+        name: groupName,
+      })
+      setVisible(false);
+      setGroupName("");
+    }
+    catch (error) {
+      return error;
+    }
+  };
   const logout = () => {
     LogOutUser()
       .then(() => {
@@ -180,6 +224,21 @@ const Dashboard =  ({ navigation }) => {
       });
     }
   };
+
+  const groupChatTap = (profileImg, groupName) => {
+    if (!profileImg) {
+      navigation.navigate("groupChat", {
+        allUsers,
+        groupName,
+        imgText: groupName.charAt(0),
+      });
+    } else {
+      navigation.navigate("groupChat", {
+        groupName,
+        img: profileImg,
+      });
+    }
+  }
   // * GET OPACITY
 
   const getOpacity = () => {
@@ -225,6 +284,7 @@ const Dashboard =  ({ navigation }) => {
           </View>
         }
         renderItem={({ item }) => (
+        
           <ShowUsers
             name={item.name}
             img={item.profileImg}
@@ -233,8 +293,59 @@ const Dashboard =  ({ navigation }) => {
           />
         )}
       />
+        <FlatList
+        alwaysBounceVertical={false}
+        data={allGroups}
+        keyExtractor={(_, index) => index.toString()}
+        onScroll={(event) =>
+          setScrollPosition(event.nativeEvent.contentOffset.y)
+        }
+        renderItem={({ item }) => (
+          <Showgroups
+          groupName={item.groupname}
+            img={item.profileImg}
+            onImgTap={() => imgTap(item.profileImg,   item.groupname)}
+            onNameTap={() => groupChatTap(item.profileImg, item.groupname)}
+          />
+        )}
+      />
+        <View style={styles.container}>
+      <RoundCornerButton title="Add Group" onPress={showDialog} />
+      <Dialog.Container visible={visible}>
+        <Dialog.Title>Add Group</Dialog.Title>
+        <Dialog.Input
+        label="Group Name" 
+        value={groupName}
+        onChangeText={(value) => setGroupName(value)}
+        ></Dialog.Input>
+        <Dialog.Button label="Cancel" onPress={handleCancel} />
+        <Dialog.Button label="Add" onPress={handleAdd} />
+      </Dialog.Container>
+    </View>
+{/* <MultiPickerMaterialDialog
+  title={'Pick some elements!'}
+  // colorAccent={this.props.colorAccent}
+  items={LIST.map((row, index) => {
+    return { value: index, label: row };
+  })}
+  visible={this.state.multiPickerVisible}
+  selectedItems={this.state.multiPickerSelectedItems}
+  onCancel={() => this.setState({ multiPickerVisible: false })}
+  onOk={result => {
+    this.setState({ multiPickerVisible: false });
+    this.setState({ multiPickerSelectedItems: result.selectedItems });
+  }}
+/>; */}
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
 
 export default Dashboard;

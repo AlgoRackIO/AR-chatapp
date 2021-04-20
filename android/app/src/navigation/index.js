@@ -8,6 +8,7 @@ import {
   Splash,
   ShowFullImg,
   Chat,
+  groupChat,
 } from "../container/";
 import { color } from "../utility";
 
@@ -61,6 +62,13 @@ function NavContainer() {
         <Stack.Screen
           name="Chat"
           component={Chat}
+          options={{
+            headerBackTitle: null,
+          }}
+        />
+          <Stack.Screen
+          name="groupChat"
+          component={groupChat}
           options={{
             headerBackTitle: null,
           }}
