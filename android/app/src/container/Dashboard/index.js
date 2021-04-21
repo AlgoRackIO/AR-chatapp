@@ -18,6 +18,7 @@ import {ShowUsers,Showgroups} from "../../components/showUserAndGroups";
 import profile from "../../components/profile";
 
 const Dashboard =  ({ navigation }) => {
+  const [key,setkey] = useState();
   const globalState = useContext(Store);
   const { dispatchLoaderAction } = globalState; 
   const [visible, setVisible] = useState(false);
@@ -98,11 +99,14 @@ const Dashboard =  ({ navigation }) => {
         firebase
         .database()
         .ref("groups")
+        .child(uuid)
         .on("value",(dataSnapshot)=>{
           let groups=[];
           dataSnapshot.forEach((data)=>{
+           setkey(data.key);
            groups.push({
              groupname: data.child("name").val(),
+             key: data.key
            })
           });
           setAllgroups(groups);
@@ -110,7 +114,20 @@ const Dashboard =  ({ navigation }) => {
             type: LOADING_STOP,
           });
         });
-      
+      firebase
+      .database()
+      .ref("groups/" + uuid)
+      .child(key)
+      .on("value",(dataSnapshot)=>{
+        dataSnapshot.forEach((data)=>{
+          let inviteUserId = data.child("memberid").val();
+          if(uuid == inviteUserId)
+          {
+            console.log('jksdcccccccccc')
+          }
+        })
+       
+      })
     } catch (error) {
       alert(error);
       dispatchLoaderAction({
@@ -172,6 +189,7 @@ const Dashboard =  ({ navigation }) => {
       await firebase
       .database()
       .ref('groups/')
+      .child(uuid)
       .push({
         name: groupName,
       })
@@ -225,16 +243,18 @@ const Dashboard =  ({ navigation }) => {
     }
   };
 
-  const groupChatTap = (profileImg, groupName) => {
+  const groupChatTap = (profileImg, groupName,key) => {
     if (!profileImg) {
       navigation.navigate("groupChat", {
         allUsers,
         groupName,
+        key,
         imgText: groupName.charAt(0),
       });
     } else {
       navigation.navigate("groupChat", {
         groupName,
+        key,
         img: profileImg,
       });
     }
@@ -301,11 +321,11 @@ const Dashboard =  ({ navigation }) => {
           setScrollPosition(event.nativeEvent.contentOffset.y)
         }
         renderItem={({ item }) => (
-          <Showgroups
+        <Showgroups
           groupName={item.groupname}
             img={item.profileImg}
             onImgTap={() => imgTap(item.profileImg,   item.groupname)}
-            onNameTap={() => groupChatTap(item.profileImg, item.groupname)}
+            onNameTap={() => groupChatTap(item.profileImg, item.groupname,item.key)}
           />
         )}
       />

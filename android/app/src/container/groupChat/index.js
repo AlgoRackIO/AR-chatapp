@@ -18,19 +18,19 @@ import { InputField, ChatBox } from "../../components";
 import firebase from "../../firebase/config";
 import { senderMsg, recieverMsg } from "../../network";
 import { deviceHeight, fieldHeight } from "../../utility/stylehelper/appStyle";
-import { smallDeviceHeight } from "../../utility/constants";
+import { smallDeviceHeight, uuid } from "../../utility/constants";
 import { MultiPickerMaterialDialog } from 'react-native-material-dialog';
 import Dialog from "react-native-dialog";
 
 
 const groupChat = ({ route, navigation }) => {
     const { params } = route;
-    const { groupName, img, allUsers } = params;
+    const { groupName, img, allUsers,key } = params;
     const [msgValue, setMsgValue] = useState("");
-    const [messeges, setMesseges] = useState([]);
+    const [messeges, setMesseges] = useState();
     const [visible, setVisible] = useState(false);
     const [MultiPickerselectedItems, setSelectedItems] = useState([]);
-
+    const [inviteUsers,setInviteUsers] = useState();
     useLayoutEffect(() => {
         navigation.setOptions({
             headerTitle: <Text>{groupName}</Text>,
@@ -51,6 +51,27 @@ const groupChat = ({ route, navigation }) => {
         setVisible(true);
     };
 
+    const addMembers = (result) => {
+        setVisible(false)
+        result.selectedItems.map(async(selected)=>
+         {
+             try{
+                 return await firebase
+                 .database()
+                 .ref('groups/' + uuid)
+                 .child(key)
+                 .push({
+                     memberid: selected.id
+                 })
+             }
+             catch(error)
+             {
+                 return error;
+             }
+         }) 
+    }
+ 
+
     return (
         <SafeAreaView style={{ backgroundColor: color.BLACK, flex: 1 }}>
             <View style={styles.container}>
@@ -64,17 +85,11 @@ const groupChat = ({ route, navigation }) => {
                     <MultiPickerMaterialDialog visible={visible}
                         title={'Invite Members'}
                         items={allUsers.map((row, index) => {
-                            return { value: index, label: row.name };
+                            return { value: index, label: row.name, id: row.id};
                         })}
                         selectedItems={MultiPickerselectedItems}
-                        onCancel={() => setVisible({ visible: false })}
-                        onOk={result => {
-                            console.log('result',result)
-                            setVisible({ visible: false })
-                             setSelectedItems(result.selectedItems);
-                             console.log('sassssssssssss',MultiPickerselectedItems);
-                        }
-                    }
+                        onCancel={() => setVisible(false)}
+                        onOk={result => addMembers(result)}
 
                     />;
                 </Text>
