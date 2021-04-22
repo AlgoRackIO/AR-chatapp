@@ -17,7 +17,10 @@ import Dialog from "react-native-dialog";
 import {ShowUsers,Showgroups} from "../../components/showUserAndGroups";
 import profile from "../../components/profile";
 
+
+
 const Dashboard =  ({ navigation }) => {
+
   const [key,setkey] = useState();
   const globalState = useContext(Store);
   const { dispatchLoaderAction } = globalState; 
@@ -28,11 +31,14 @@ const Dashboard =  ({ navigation }) => {
     name: "",
     profileImg: "",
   });
-
+  const [guestUserId, setguestUserId] = useState([]);
   const [getScrollPosition, setScrollPosition] = useState(0);
   const [allUsers, setAllUsers] = useState([]);
   const [allGroups, setAllgroups] = useState([]);
   const { profileImg, name } = userDetail;
+  const [guestKey, setguestKey] = useState();
+
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -116,18 +122,40 @@ const Dashboard =  ({ navigation }) => {
         });
       firebase
       .database()
-      .ref("groups/" + uuid)
-      .child(key)
+      .ref("groups/" + guestUserId)
       .on("value",(dataSnapshot)=>{
         dataSnapshot.forEach((data)=>{
-          let inviteUserId = data.child("memberid").val();
-          if(uuid == inviteUserId)
-          {
-            console.log('jksdcccccccccc')
+          setguestKey(data.key)
+        })
+      })
+      firebase
+      .database()
+      .ref("groups/" + guestUserId)
+      .child(guestKey)
+      .on("value",(dataSnapshot)=>{
+        dataSnapshot.forEach((data)=>{
+          let inviteUserId = data.child("memberid").val()
+          console.log('////////////////////////////////',data)
+          if(uuid == inviteUserId){
+            Alert.alert(
+              "Alert Title",
+              "My Alert Msg",
+              [
+                {
+                  text: "Ask me later",
+                  onPress: () => console.log("Ask me later pressed")
+                },
+                {
+                  text: "Cancel",
+                  style: "cancel"
+                },
+                { text: "OK", onPress: () => setVisible(true) }
+              ]
+            );
           }
         })
-       
       })
+
     } catch (error) {
       alert(error);
       dispatchLoaderAction({
@@ -135,7 +163,6 @@ const Dashboard =  ({ navigation }) => {
       });
     }
   }, []);
-
   const selectPhotoTapped = () => {
     const options = {
       storageOptions: {
@@ -304,7 +331,8 @@ const Dashboard =  ({ navigation }) => {
           </View>
         }
         renderItem={({ item }) => (
-        
+        setguestUserId(item.id),
+
           <ShowUsers
             name={item.name}
             img={item.profileImg}
@@ -321,8 +349,8 @@ const Dashboard =  ({ navigation }) => {
           setScrollPosition(event.nativeEvent.contentOffset.y)
         }
         renderItem={({ item }) => (
-        <Showgroups
-          groupName={item.groupname}
+        <Showgroups visible={visible}
+            groupName={item.groupname}
             img={item.profileImg}
             onImgTap={() => imgTap(item.profileImg,   item.groupname)}
             onNameTap={() => groupChatTap(item.profileImg, item.groupname,item.key)}
