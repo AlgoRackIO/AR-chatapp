@@ -1,7 +1,6 @@
 import firebase from '../../firebase/config';
 const senderMsg = async (msgValue, currentUserId, guestUserId, img) => {
   try {
-    console.log('Idsssssssssssssssssssss',currentUserId,guestUserId)
     return await firebase
       .database()
       .ref('messeges/' + currentUserId)

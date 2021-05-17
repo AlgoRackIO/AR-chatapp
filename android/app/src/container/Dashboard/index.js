@@ -16,6 +16,7 @@ import { MultiPickerMaterialDialog } from 'react-native-material-dialog';
 import Dialog from "react-native-dialog";
 import {ShowUsers,Showgroups} from "../../components/showUserAndGroups";
 import profile from "../../components/profile";
+import { Dimensions } from "react-native";
 
 
 
@@ -31,14 +32,12 @@ const Dashboard =  ({ navigation }) => {
     name: "",
     profileImg: "",
   });
-  const [guestUserId, setguestUserId] = useState([]);
+
   const [getScrollPosition, setScrollPosition] = useState(0);
   const [allUsers, setAllUsers] = useState([]);
   const [allGroups, setAllgroups] = useState([]);
   const { profileImg, name } = userDetail;
-  const [guestKey, setguestKey] = useState();
-
-
+  let guestIDs = [];
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -88,6 +87,9 @@ const Dashboard =  ({ navigation }) => {
               currentUser.id = uuid;
               currentUser.name = child.val().name;
               currentUser.profileImg = child.val().profileImg;
+              if (child.val().groups){
+                setAllgroups(Object.entries(child.val().groups))
+              }
             } else {
               users.push({
                 id: child.val().uuid,
@@ -102,60 +104,6 @@ const Dashboard =  ({ navigation }) => {
             type: LOADING_STOP,
           });
         });
-        firebase
-        .database()
-        .ref("groups")
-        .child(uuid)
-        .on("value",(dataSnapshot)=>{
-          let groups=[];
-          dataSnapshot.forEach((data)=>{
-           setkey(data.key);
-           groups.push({
-             groupname: data.child("name").val(),
-             key: data.key
-           })
-          });
-          setAllgroups(groups);
-          dispatchLoaderAction({
-            type: LOADING_STOP,
-          });
-        });
-      firebase
-      .database()
-      .ref("groups/" + guestUserId)
-      .on("value",(dataSnapshot)=>{
-        dataSnapshot.forEach((data)=>{
-          setguestKey(data.key)
-        })
-      })
-      firebase
-      .database()
-      .ref("groups/" + guestUserId)
-      .child(guestKey)
-      .on("value",(dataSnapshot)=>{
-        dataSnapshot.forEach((data)=>{
-          let inviteUserId = data.child("memberid").val()
-          console.log('////////////////////////////////',data)
-          if(uuid == inviteUserId){
-            Alert.alert(
-              "Alert Title",
-              "My Alert Msg",
-              [
-                {
-                  text: "Ask me later",
-                  onPress: () => console.log("Ask me later pressed")
-                },
-                {
-                  text: "Cancel",
-                  style: "cancel"
-                },
-                { text: "OK", onPress: () => setVisible(true) }
-              ]
-            );
-          }
-        })
-      })
-
     } catch (error) {
       alert(error);
       dispatchLoaderAction({
@@ -163,6 +111,7 @@ const Dashboard =  ({ navigation }) => {
       });
     }
   }, []);
+ 
   const selectPhotoTapped = () => {
     const options = {
       storageOptions: {
@@ -213,14 +162,21 @@ const Dashboard =  ({ navigation }) => {
 
   const handleAdd = async() => {
     try{
-      await firebase
+      let t = await firebase
       .database()
       .ref('groups/')
-      .child(uuid)
       .push({
         name: groupName,
+        participants:[uuid]
       })
-      setVisible(false);
+      t.once("value",async (snap)=>{
+        await firebase
+        .database()
+        .ref('users/' + uuid + "/groups/"+snap.val().name)
+        .set( {groupid:t.key, })
+        setVisible(false);
+      })
+     
       setGroupName("");
     }
     catch (error) {
@@ -239,7 +195,6 @@ const Dashboard =  ({ navigation }) => {
       .catch((err) => alert(err));
   };
 
-  // * ON IMAGE TAP
   const imgTap = (profileImg, name) => {
     if (!profileImg) {
       navigation.navigate("ShowFullImg", {
@@ -248,10 +203,14 @@ const Dashboard =  ({ navigation }) => {
       });
     } else {
       navigation.navigate("ShowFullImg", { name, img: profileImg });
-    }
+    }       <TouchableOpacity style={[styles.logoContainer]} onPress={onImgTap}>
+    {img ? (
+      <Thumbnail source={{ uri: img }} resizeMode="cover" />
+    ) : (
+      <Text style={styles.thumbnailName}>{groupName.charAt(0)}</Text>
+    )}
+  </TouchableOpacity>
   };
-
-  // * ON NAME TAP
   const nameTap = (profileImg, name, guestUserId) => {
     if (!profileImg) {
       navigation.navigate("Chat", {
@@ -269,25 +228,24 @@ const Dashboard =  ({ navigation }) => {
       });
     }
   };
-
-  const groupChatTap = (profileImg, groupName,key) => {
+  const groupChatTap = (groupName,guestUserId=[]) => {
     if (!profileImg) {
       navigation.navigate("groupChat", {
         allUsers,
         groupName,
-        key,
-        imgText: groupName.charAt(0),
+        // guestUserId,
+        // imgText: groupName[0].charAt(0),
       });
     } else {
       navigation.navigate("groupChat", {
+        // allUsers,
         groupName,
-        key,
-        img: profileImg,
+        guestUserId,
+        // img: profileImg,
       });
     }
   }
-  // * GET OPACITY
-
+  
   const getOpacity = () => {
     if (deviceHeight < smallDeviceHeight) {
       return deviceHeight / 4;
@@ -297,15 +255,13 @@ const Dashboard =  ({ navigation }) => {
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: color.BLACK }}>
-      {getScrollPosition > getOpacity() && (
-        <StickyHeader
-          name={name}
-          img={profileImg}
-          onImgTap={() => imgTap(profileImg, name)}
-        />
-      )}
-
-      {/* ALL USERS */}
+       <Profile
+              img={profileImg}
+              onImgTap={() => imgTap(profileImg, name)}
+              onEditImgTap={() => selectPhotoTapped()}
+              name={name}
+            />
+      <Text style={{color:'white',fontSize:20}}>Direct</Text>
       <FlatList
         alwaysBounceVertical={false}
         data={allUsers}
@@ -313,49 +269,34 @@ const Dashboard =  ({ navigation }) => {
         onScroll={(event) =>
           setScrollPosition(event.nativeEvent.contentOffset.y)
         }
-        ListHeaderComponent={
-          <View
-            style={{
-              opacity:
-                getScrollPosition < getOpacity()
-                  ? (getOpacity() - getScrollPosition) / 100
-                  : 0,
-            }}
-          >
-            <Profile
-              img={profileImg}
-              onImgTap={() => imgTap(profileImg, name)}
-              onEditImgTap={() => selectPhotoTapped()}
-              name={name}
-            />
-          </View>
-        }
+        style={{height:Dimensions.get('screen').height* 0.25}}
         renderItem={({ item }) => (
-        setguestUserId(item.id),
-
           <ShowUsers
             name={item.name}
             img={item.profileImg}
             onImgTap={() => imgTap(item.profileImg, item.name)}
-            onNameTap={() => nameTap(item.profileImg, item.name, item.id)}
+            onNameTap={() => nameTap(item.profileImg, item.name,item.id)}
           />
         )}
       />
+      <Text style={{color:'white',fontSize:20}}>Groups</Text>
         <FlatList
+        style={{height:Dimensions.get('screen').height* 0.3, marginBottom:80}}
         alwaysBounceVertical={false}
         data={allGroups}
         keyExtractor={(_, index) => index.toString()}
         onScroll={(event) =>
           setScrollPosition(event.nativeEvent.contentOffset.y)
         }
-        renderItem={({ item }) => (
-        <Showgroups visible={visible}
-            groupName={item.groupname}
-            img={item.profileImg}
-            onImgTap={() => imgTap(item.profileImg,   item.groupname)}
-            onNameTap={() => groupChatTap(item.profileImg, item.groupname,item.key)}
+        renderItem={({ item }) => {
+          return (
+        <Showgroups
+            groupName={item[0]}
+            // img={profileImg}
+            // onImgTap={() => imgTap(item.profileImg,   item.groupname)}
+            onNameTap={() => groupChatTap(item,guestIDs)}
           />
-        )}
+        )}}
       />
         <View style={styles.container}>
       <RoundCornerButton title="Add Group" onPress={showDialog} />
@@ -370,20 +311,6 @@ const Dashboard =  ({ navigation }) => {
         <Dialog.Button label="Add" onPress={handleAdd} />
       </Dialog.Container>
     </View>
-{/* <MultiPickerMaterialDialog
-  title={'Pick some elements!'}
-  // colorAccent={this.props.colorAccent}
-  items={LIST.map((row, index) => {
-    return { value: index, label: row };
-  })}
-  visible={this.state.multiPickerVisible}
-  selectedItems={this.state.multiPickerSelectedItems}
-  onCancel={() => this.setState({ multiPickerVisible: false })}
-  onOk={result => {
-    this.setState({ multiPickerVisible: false });
-    this.setState({ multiPickerSelectedItems: result.selectedItems });
-  }}
-/>; */}
     </SafeAreaView>
   );
 };

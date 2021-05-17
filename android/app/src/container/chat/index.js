@@ -30,6 +30,8 @@ const Chat = ({ route, navigation }) => {
     });
   }, [navigation]);
 
+  console.log('ids',currentUserId,guestUserId)
+
   useEffect(() => {
     try {
       firebase
@@ -39,12 +41,12 @@ const Chat = ({ route, navigation }) => {
         .on("value", (dataSnapshot) => {
           let msgs = [];
           dataSnapshot.forEach((child) => {
-            msgs.push({
-              sendBy: child.val().sender,
-              recievedBy: child.val().reciever,
-              msg: child.val().msg,
-              img: child.val().img,
-            });
+              msgs.push({
+                sendBy: child.val().sender,
+                recievedBy: child.val().reciever,
+                msg: child.val().msg,
+                img: child.val().img,
+              });
           });
           setMesseges(msgs.reverse());
         });

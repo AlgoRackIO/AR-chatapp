@@ -8,16 +8,16 @@ const getDimensions = (key) => {
     switch (key) {
       case "imgContainer":
         return {
-          height: 154,
-          width: 154,
+          height: 124,
+          width: 124,
           borderRadius: 77,
           borderWidth: 2,
           borderColor: color.WHITE,
         };
       case "img":
         return {
-          height: 150,
-          width: 150,
+          height: 120,
+          width: 120,
           borderRadius: 75,
         };
       case "editImgContainer":
@@ -27,7 +27,7 @@ const getDimensions = (key) => {
           borderRadius: 20,
           backgroundColor: color.SEMI_TRANSPARENT,
           position: "absolute",
-          right: 20,
+          right: 15,
           bottom: 10,
         };
 

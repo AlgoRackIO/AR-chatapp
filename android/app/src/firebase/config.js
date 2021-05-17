@@ -2,10 +2,10 @@
 import firebase from 'firebase';
 
 const firebaseconfig = {
-    apiKey: 'AIzaSyBf_O82rvXjBOFlBLBqZsSj2RJxtPuWrVY',
-    databaseURL: 'https://reactapp-308dd-default-rtdb.firebaseio.com',
-    projectId: 'reactapp-308dd',
-    appId: '1:387972525332:android:6e3ca954031bf2d8066601',
+    apiKey: 'AIzaSyBuFYyiKzzDyFNR2p6_hA9vW_zhF8bp8is',
+    databaseURL: 'https://chatapp-81f38-default-rtdb.firebaseio.com/',
+    projectId: 'reactapp-chatapp-81f38',
+    appId: '1:387972525332:android:1:705618142411:android:95cc0210cf922d9e8c674e',
     
 };
 

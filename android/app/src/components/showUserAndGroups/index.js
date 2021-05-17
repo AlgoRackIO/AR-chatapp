@@ -32,13 +32,13 @@ const Showgroups = ({groupName, img, onImgTap, onNameTap}) => {
     <Card style={styles.cardStyle}>
     <CardItem style={styles.cardItemStyle}>
       <Left>
-        <TouchableOpacity style={[styles.logoContainer]} onPress={onImgTap}>
+        {/* <TouchableOpacity style={[styles.logoContainer]} onPress={onImgTap}>
           {img ? (
             <Thumbnail source={{ uri: img }} resizeMode="cover" />
           ) : (
             <Text style={styles.thumbnailName}>{groupName.charAt(0)}</Text>
           )}
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <Body>
           <Text style={styles.profileName} onPress={onNameTap}>
